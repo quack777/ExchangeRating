@@ -18,7 +18,7 @@ const CalculateFirst = () => {
 
     const handleClick=(e)=>{
         e.preventDefault();
-        if (money <0 || money > 10000 || money === '' || money !== NaN){
+        if (money <0 || money > 10000 || money === '' || money === NaN){
             console.log(money)
             alert("송금액이 바르지 않습니다")
             setClick(false)
@@ -26,6 +26,7 @@ const CalculateFirst = () => {
             setClick(true);
         }
     }
+
   return(
     <div className = 'FirstCalculator-container'>
         <p className = 'first-title'>환율 계산</p>
@@ -42,7 +43,7 @@ const CalculateFirst = () => {
                 환율: {exchangeRate[`USD${userChoice}`]} {userChoice}/USD
             </p>
             <p>
-                송금액: <input onChange={(event)=>setMoney(event.target.value)}/> USD
+                송금액: <input type = 'number' onChange={(event)=>setMoney(event.target.value)}/> USD
             </p>
             <button className='first-btn' type='submit'>Submit</button>
         </form>
@@ -50,6 +51,5 @@ const CalculateFirst = () => {
     </div>
   )
 };
-
 
 export default CalculateFirst;
