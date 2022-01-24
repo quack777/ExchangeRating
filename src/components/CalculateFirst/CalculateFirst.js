@@ -1,8 +1,51 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import client from '../../lib/api/client'
+import SetNumberFormat from '../../utils/SetNumberFormat'
+import './CalculateFirst.css'
 
 const CalculateFirst = () => {
+    const [exchangeRate, setExchangeRate] = useState('')
+    const [userChoice, setUserChoice] = useState('KRW');
+    const [money,setMoney] = useState();
+    const [click, setClick] = useState(false);
+
+    useEffect(()=>{
+        setClick(false)
+        client.get(process.env.REACT_APP_API_URL,{params: {access_key: process.env.REACT_APP_API_KEY}})
+                .then((res)=>setExchangeRate(res.data.quotes))
+                .catch((err)=>console.dir(err))
+    },[userChoice,money]) //사용자가 값을 바꿀때마다 리렌더링
+
+    const handleClick=()=>{
+        if (money <0 || money > 10000 || money === ''){
+            console.log(money)
+            alert("송금액이 바르지 않습니다")
+            setClick(false)
+        }else{
+            setClick(true);
+        }
+    }
   return(
-    <div>
+    <div className = 'FirstCalculator-container'>
+        <p>환율 계산</p>
+        <form onSubmit={(e)=>e.preventDefault()}>
+          <p>송금국가 : 미국(USD)</p>
+          <div>수취국가 :
+              <select onChange={(event)=>setUserChoice(event.target.value)}>
+                  <option value="KRW">한국(KRW)</option>
+                  <option value="JPY">일본(JPY)</option>
+                  <option value ="PHP">필리핀(PHP)</option>
+              </select>
+          </div>
+            <p>
+                환율: {exchangeRate[`USD${userChoice}`]}
+            </p>
+            <p>
+                송금액: <input onChange={(event)=>setMoney(event.target.value)}/> USD
+            </p>
+            <button type='submit' onClick={handleClick}>Submit</button>
+        </form>
+            {click? <div>수취금액은 {SetNumberFormat(money*exchangeRate[`USD${userChoice}`])} {userChoice}입니다</div> : ''}
     </div>
   )
 };
