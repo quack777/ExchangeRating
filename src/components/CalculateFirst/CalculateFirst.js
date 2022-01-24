@@ -16,8 +16,9 @@ const CalculateFirst = () => {
                 .catch((err)=>console.dir(err))
     },[userChoice,money]) //사용자가 값을 바꿀때마다 리렌더링
 
-    const handleClick=()=>{
-        if (money <0 || money > 10000 || money === ''){
+    const handleClick=(e)=>{
+        e.preventDefault();
+        if (money <0 || money > 10000 || money === '' || money !== NaN){
             console.log(money)
             alert("송금액이 바르지 않습니다")
             setClick(false)
@@ -28,7 +29,7 @@ const CalculateFirst = () => {
   return(
     <div className = 'FirstCalculator-container'>
         <p className = 'first-title'>환율 계산</p>
-        <form className = 'first-form' onSubmit={(e)=>e.preventDefault()}>
+        <form className = 'first-form' onSubmit={handleClick}>
           <p>송금국가 : 미국(USD)</p>
           <div>수취국가 :
               <select onChange={(event)=>setUserChoice(event.target.value)}>
@@ -43,7 +44,7 @@ const CalculateFirst = () => {
             <p>
                 송금액: <input onChange={(event)=>setMoney(event.target.value)}/> USD
             </p>
-            <button className='first-btn' type='submit' onClick={handleClick}>Submit</button>
+            <button className='first-btn' type='submit'>Submit</button>
         </form>
             {click? <div className='first-res'>수취금액은 {SetNumberFormat(money*exchangeRate[`USD${userChoice}`])} {userChoice}입니다</div> : ''}
     </div>
