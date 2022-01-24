@@ -1,4 +1,5 @@
-.template {
-  border: 1px solid #000000;
-  padding: 10px 3px;
+.calculateSecondTemplate {
+  max-width: 300px;
+  border: 4px solid #000000;
+  padding: 10px 30px;
 }
