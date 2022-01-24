@@ -27,8 +27,8 @@ const CalculateFirst = () => {
     }
   return(
     <div className = 'FirstCalculator-container'>
-        <p>환율 계산</p>
-        <form onSubmit={(e)=>e.preventDefault()}>
+        <p className = 'first-title'>환율 계산</p>
+        <form className = 'first-form' onSubmit={(e)=>e.preventDefault()}>
           <p>송금국가 : 미국(USD)</p>
           <div>수취국가 :
               <select onChange={(event)=>setUserChoice(event.target.value)}>
@@ -38,14 +38,14 @@ const CalculateFirst = () => {
               </select>
           </div>
             <p>
-                환율: {exchangeRate[`USD${userChoice}`]}
+                환율: {exchangeRate[`USD${userChoice}`]} {userChoice}/USD
             </p>
             <p>
                 송금액: <input onChange={(event)=>setMoney(event.target.value)}/> USD
             </p>
-            <button type='submit' onClick={handleClick}>Submit</button>
+            <button className='first-btn' type='submit' onClick={handleClick}>Submit</button>
         </form>
-            {click? <div>수취금액은 {SetNumberFormat(money*exchangeRate[`USD${userChoice}`])} {userChoice}입니다</div> : ''}
+            {click? <div className='first-res'>수취금액은 {SetNumberFormat(money*exchangeRate[`USD${userChoice}`])} {userChoice}입니다</div> : ''}
     </div>
   )
 };
