@@ -1,0 +1,30 @@
+.FirstCalculator-container{
+    display:flex;
+    flex-direction: column;
+    width: 300px;
+}
+.FirstCalculator-container>*{
+    margin:3%;
+}
+.first-title{
+    font-size:30px;
+    font-weight:700;
+    padding-bottom:30px;
+}
+.first-form>*{
+    margin-bottom:3%;
+    margin-top:3%;
+}
+.first-btn{
+    width:100%;
+    padding-top:2%;
+    border-radius:5px;
+}
+
+.first-btn:hover{
+    background-color:darkgray;
+}
+select{
+    border-radius:4px;
+    height:25px;
+}
