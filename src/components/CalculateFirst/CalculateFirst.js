@@ -14,12 +14,13 @@ const CalculateFirst = () => {
         client.get(process.env.REACT_APP_API_URL,{params: {access_key: process.env.REACT_APP_API_KEY}})
                 .then((res)=>setExchangeRate(res.data.quotes))
                 .catch((err)=>console.dir(err))
-    },[userChoice,money]) //사용자가 값을 바꿀때마다 리렌더링
+    },[userChoice]) //사용자가 값을 바꿀때마다 리렌더링
 
     const handleClick=(e)=>{
         e.preventDefault();
-        if (money <0 || money > 10000 || money === '' || money === NaN){
-            console.log(money)
+        setMoney(e.target[1].value)
+        let tmpMoney = e.target[1].value;
+        if (tmpMoney <0 || tmpMoney > 10000 || tmpMoney === '' || tmpMoney === NaN){
             alert("송금액이 바르지 않습니다")
             setClick(false)
         }else{
@@ -29,8 +30,8 @@ const CalculateFirst = () => {
 
   return(
     <div className = 'FirstCalculator-container'>
-        <p className = 'first-title'>환율 계산</p>
         <form className = 'first-form' onSubmit={handleClick}>
+            <p className = 'first-title'>환율 계산</p>
           <p>송금국가 : 미국(USD)</p>
           <div>수취국가 :
               <select onChange={(event)=>setUserChoice(event.target.value)}>
@@ -40,10 +41,10 @@ const CalculateFirst = () => {
               </select>
           </div>
             <p>
-                환율: {exchangeRate[`USD${userChoice}`]} {userChoice}/USD
+                환율: {SetNumberFormat(exchangeRate[`USD${userChoice}`])} {userChoice}/USD
             </p>
             <p>
-                송금액: <input type = 'number' onChange={(event)=>setMoney(event.target.value)}/> USD
+                송금액: <input type = 'number' required={true}/> USD
             </p>
             <button className='first-btn' type='submit'>Submit</button>
         </form>
