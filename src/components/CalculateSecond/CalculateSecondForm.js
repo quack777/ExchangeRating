@@ -1,34 +1,25 @@
 import React, { useEffect, useState } from "react";
 import CalculateRateBox from "./CalculateRateBox.js";
 import "./CalculateSecondForm.css";
-import client from "../../api/client";
+import { getApiOfExchangeRate } from '../../api/GetApi';
 import { inputPriceFormat } from "../../utils/SetNumberFormat";
 
 const CalculateSecondForm = () => {
   const [defaultQuotes, setDefaultQuotes] = useState({});
   const [currentQuotes, setCurrentQuotes] = useState({});
-  const [currentTimeStamp, setCurrentTimeStamp] = useState(null);
-  const [currentExchangedMoney, setCurrentExchangedMoney] = useState(null);
+  const [currentTimeStamp, setCurrentTimeStamp] = useState('');
+  const [currentExchangedMoney, setCurrentExchangedMoney] = useState(0);
   const [prevSelectedCurrency, setPrevSelectedCurrency] = useState("");
   const [currentSelectedCurrency, setCurrentSelectedCurrency] = useState("USD");
-  const [convertNum, setConvertNum] = useState(undefined);
+  const [convertNum, setConvertNum] = useState('');
 
   const countryRates = ["USD", "CAD", "KRW", "HKD", "JPY", "CNY"];
-
-  const getExchangedMoney = () => {
-    return client.get("http://api.currencylayer.com/live", {
-      params: {
-        access_key: 'f33bb1d4036607720bf76faec1e019c7',
-        source: "USD",
-        currencies: 'USD, CAD, KRW, HKD, JPY, CNY',
-      },
-    });
-  };
 
   const checkInputedController = async (event) => {
     const currentTargetedController = event.target.nodeName;
     if (currentTargetedController === "INPUT") {
-      const currentInputValue = event.target.value; 
+      let currentInputValue = event.target.value; 
+      currentInputValue = currentInputValue.replace(/[,]/g, '');
 
       const currentInputedMoney = Number(currentInputValue);
       setCurrentExchangedMoney(currentInputedMoney);
@@ -52,7 +43,7 @@ const CalculateSecondForm = () => {
 
   useEffect(() => {
     const getCurrentCurrencies = async () => {
-      const response = await getExchangedMoney();
+      const response = await getApiOfExchangeRate('USD', countryRates.join(','));
       const {
         data: { quotes, timestamp },
       } = response;

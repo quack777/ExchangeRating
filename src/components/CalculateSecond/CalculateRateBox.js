@@ -52,6 +52,7 @@ const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeSta
       }
     }
   }, [currentQuotes, currentSelectedCurrency, prevSelectedCurrency]);
+
   
   return (
     <div className="CalculateRateBox">
@@ -65,7 +66,7 @@ const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeSta
         })}
       </ul>
         <div className="tabsInfo">
-          <p className="countryRate">{`${currentActiveTab} : ${currentExchangedMoney || currentMoney === 0 ? SetNumberFormat(currentMoney) : '올바른 송금액을 입력해 주세요'}`} </p>
+          <p className="countryRate">{`${currentActiveTab} : ${currentMoney === 0 || currentExchangedMoney.toString().length < 5 ? SetNumberFormat(currentMoney) : '금액 초과'}`} </p>
           <p className="rateLiveDate">
             기준일: <br /> {currentTimeStamp && createDate()}
           </p>

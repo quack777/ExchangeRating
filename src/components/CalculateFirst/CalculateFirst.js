@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import SetNumberFormat from '../../utils/SetNumberFormat'
-import GetApi from "../../utils/GetApi";
+import {getApiOfExchangeRate} from "../../api/GetApi.js";
 import './CalculateFirst.css'
 
 const CalculateFirst = () => {
@@ -11,7 +11,7 @@ const CalculateFirst = () => {
 
     useEffect(()=>{
         setClick(false)
-        GetApi(money,"USD")
+        getApiOfExchangeRate("USD")
             .then((res)=>setExchangeRate(res.data.quotes))
             .catch((err)=>console.dir(err))
     },[userChoice]) //사용자가 값을 바꿀때마다 리렌더링
@@ -49,7 +49,7 @@ const CalculateFirst = () => {
                 </p>
                 <button className='first-btn' type='submit'>Submit</button>
             </form>
-                {click? <div className='first-res'>수취금액은 {SetNumberFormat(money*exchangeRate[`USD${userChoice}`])} {userChoice}입니다</div> : ''}
+                {click? <div className='first-res'>수취금액은 {exchangeRate && SetNumberFormat(money*exchangeRate[`USD${userChoice}`])} {userChoice}입니다</div> : ''}
         </div>
   )
 };
