@@ -1,29 +1,26 @@
 import React, { useEffect, useState } from "react";
 import CalculateRateBox from "./CalculateRateBox.js";
 import "./CalculateSecondForm.css";
-import client from "../../pages/Main/lib/api/client";
-import SetNumberFormat, { inputPriceFormat } from "../../utils/SetNumberFormat";
+import client from "../../api/client";
+import { inputPriceFormat } from "../../utils/SetNumberFormat";
 
 const CalculateSecondForm = () => {
-  const [countryRates, setCountryRates] = useState(["USD", "CAD", "KRW", "HKD", "JPY", "CNY"]);
+  const [defaultQuotes, setDefaultQuotes] = useState({});
   const [currentQuotes, setCurrentQuotes] = useState({});
   const [currentTimeStamp, setCurrentTimeStamp] = useState(null);
-  const [currentExchangedMoney, setCurrentExchangedMoney] = useState(0);
+  const [currentExchangedMoney, setCurrentExchangedMoney] = useState(null);
+  const [prevSelectedCurrency, setPrevSelectedCurrency] = useState("");
   const [currentSelectedCurrency, setCurrentSelectedCurrency] = useState("USD");
-  const [convertNum, setConvertNum] = useState(0);
+  const [convertNum, setConvertNum] = useState(undefined);
 
-  const exceptSelectedCurrencies = (currentSelectedCurrency) => {
-    const filteredCountryRates = countryRates.filter((countryRate) => countryRate !== currentSelectedCurrency);
-    return filteredCountryRates;
-  };
+  const countryRates = ["USD", "CAD", "KRW", "HKD", "JPY", "CNY"];
 
-  const getExchangedMoney = (amount, source, currencies) => {
+  const getExchangedMoney = () => {
     return client.get("http://api.currencylayer.com/live", {
       params: {
-        access_key: process.env.REACT_APP_API_KEY,
-        source: "USD", // test
-        currencies: currencies.join(","),
-        amount,
+        access_key: 'f33bb1d4036607720bf76faec1e019c7',
+        source: "USD",
+        currencies: 'USD, CAD, KRW, HKD, JPY, CNY',
       },
     });
   };
@@ -31,52 +28,59 @@ const CalculateSecondForm = () => {
   const checkInputedController = async (event) => {
     const currentTargetedController = event.target.nodeName;
     if (currentTargetedController === "INPUT") {
-      const currentInputedMoney = event.target.value;
+      const currentInputValue = event.target.value; 
 
-      const exceptedCurrencies = exceptSelectedCurrencies(currentSelectedCurrency);
-      const response = await getExchangedMoney(currentInputedMoney, currentSelectedCurrency, exceptedCurrencies);
-      const {
-        data: { quotes, timestamp },
-      } = response;
-
-      setCurrentQuotes({ ...currentQuotes, ...quotes });
-      setCurrentTimeStamp(timestamp);
-
+      const currentInputedMoney = Number(currentInputValue);
       setCurrentExchangedMoney(currentInputedMoney);
+
     } else if (currentTargetedController === "SELECT") {
-      const currentSelectedCurrency = event.target.options[event.target.selectedIndex].value;
-      setCurrentSelectedCurrency(currentSelectedCurrency);
+      const selectedCurrency = event.target.options[event.target.selectedIndex].value;
+      const selectedCurrencyRatio = defaultQuotes[currentSelectedCurrency];
 
-      const exceptedCurrencies = exceptSelectedCurrencies(currentSelectedCurrency);
+      const newQuotes = {};
 
-      const response = await getExchangedMoney(currentExchangedMoney, currentSelectedCurrency, exceptedCurrencies);
-      const {
-        data: { quotes, timestamp },
-      } = response;
-    }
+      for(let [key, val] of Object.entries(defaultQuotes)) {
+          if(key === selectedCurrency) continue;
+          newQuotes[key] = val / selectedCurrencyRatio; 
+      }
+      
+      setPrevSelectedCurrency(currentSelectedCurrency);
+      setCurrentSelectedCurrency(selectedCurrency);
+      setCurrentQuotes({...newQuotes});
   };
+}
 
   useEffect(() => {
     const getCurrentCurrencies = async () => {
-      const expectedCurrencies = exceptSelectedCurrencies(currentSelectedCurrency);
-
-      const response = await getExchangedMoney(currentExchangedMoney, "USD", expectedCurrencies);
+      const response = await getExchangedMoney();
       const {
         data: { quotes, timestamp },
       } = response;
 
-      setCurrentQuotes({ ...currentQuotes, ...quotes });
+      const convertedQuotes = {
+        'USD': quotes.USDUSD,
+        'CAD': quotes.USDCAD,
+        'KRW': quotes.USDKRW,
+        'HKD': quotes.USDHKD,
+        'JPY': quotes.USDJPY,
+        'CNY': quotes.USDCNY,
+      }
+
+      setDefaultQuotes({ ...convertedQuotes });
+
+      delete convertedQuotes['USD'];
+
+      setCurrentQuotes({...convertedQuotes});
       setCurrentTimeStamp(timestamp);
     };
 
     getCurrentCurrencies();
   }, []);
-  console.log(Number(currentExchangedMoney).toLocaleString());
+  
   return (
     <div className="calculateSecondForm">
       <div className="controllerHeader" onChange={checkInputedController}>
-        <input className="rateInput" type="text" value={convertNum} onChange={(e) => setConvertNum(inputPriceFormat(e.target.value))} />
-        {/* <input className="rateInput" type="number" defaultvalue={Number(currentExchangedMoney).toLocaleString()} /> */}
+        <input placeholder="금액 입력" className="rateInput" type="text" value={convertNum} onChange={(e) => setConvertNum(inputPriceFormat(e.target.value))} />
         <select className="rateSelected">
           {countryRates.map((countryRate, index) => {
             return (
@@ -87,7 +91,7 @@ const CalculateSecondForm = () => {
           })}
         </select>
       </div>
-      <CalculateRateBox currentExchangedMoney={currentExchangedMoney} currentQuotes={currentQuotes} currentTimeStamp={currentTimeStamp} currentSelectedCurrency={currentSelectedCurrency} />
+      <CalculateRateBox currentExchangedMoney={currentExchangedMoney} currentQuotes={currentQuotes} currentTimeStamp={currentTimeStamp} currentSelectedCurrency={currentSelectedCurrency} prevSelectedCurrency={prevSelectedCurrency} />
     </div>
   );
 };

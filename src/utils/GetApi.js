@@ -1,4 +1,4 @@
-import client from "../pages/Main/lib/api/client";
+import client from "../api/client";
 
 const GetApi = (currentInputedMoney, currentSelectedCountry) => {
   return client.get("http://api.currencylayer.com/live", {

@@ -1,14 +1,14 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./CalculateRateBox.css";
 import { setMonthConvert } from "../../utils/setMonthConvert";
 import SetNumberFormat from "../../utils/SetNumberFormat";
 
-const regExp = /[,]/g;
 
-const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeStamp, currentSelectedCurrency }) => {
-  const [rateList, setRateList] = useState(["CAD", "KRW", "HKD", "JPY", "CNY"]);
-  const [currentActiveCurrency, setCurrentActiveCurrency] = useState("CAD");
+const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeStamp, currentSelectedCurrency,  prevSelectedCurrency}) => {
+  const [tabList, setTabList] = useState(["CAD", "KRW", "HKD", "JPY", "CNY"]);
+  const [currentActiveTab, setCurrentActiveTab] = useState("CAD");
   const [currentMoney, setCurrentMoney] = useState(0);
+
 
   const createDate = () => {
     const date = new Date(currentTimeStamp * 1000);
@@ -24,62 +24,52 @@ const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeSta
     const currentClickedTab = event.target.dataset.rate;
 
     for (let [key, val] of Object.entries(currentQuotes)) {
-      const currentCurrency = key.slice(3, key.length);
-
-      if (currentCurrency === currentClickedTab) {
-        const convert = currentExchangedMoney.replace(regExp, "");
-        console.log(convert);
-        setCurrentActiveCurrency(convert);
-        setCurrentMoney(val * Number(convert));
+      if (key === currentClickedTab) {
+        setCurrentActiveTab(key);
+        setCurrentMoney(val * currentExchangedMoney);
       }
     }
   };
 
-  useLayoutEffect(() => {
-    if (currentSelectedCurrency === "CAD") {
-      const newRateList = [...rateList];
-      newRateList[0] = "USD";
-
-      setRateList(newRateList);
-      setCurrentActiveCurrency("USD");
-    } else if (currentSelectedCurrency === "USD") {
-      const newRateList = [...rateList];
-      newRateList[0] = "CAD";
-
-      setRateList(newRateList);
-      setCurrentActiveCurrency("CAD");
+  useEffect(() => {
+    for(let [key, val] of Object.entries(currentQuotes)) {
+      if(key === currentActiveTab) {
+        setCurrentMoney(val * currentExchangedMoney);
+      }
     }
+  }, [currentExchangedMoney]);
+  
+  useEffect(() => {
+    for(let i = 0; i < tabList.length; i++) {
+        if(tabList[i] === currentSelectedCurrency) {
+        setCurrentActiveTab(prevSelectedCurrency);
 
-    if (currentActiveCurrency === "CAD") {
-      const currentQuote = !currentQuotes["USDCAD"] ? 0 : currentQuotes["USDCAD"];
-
-      // const convert = currentExchangedMoney.replace(regExp, "");
-      // setCurrentMoney(currentQuote * Number(convert));
-      // console.log(currentExchangedMoney);
+        const newTabList = [...tabList];  
+        newTabList[i] = prevSelectedCurrency;
+        setTabList(newTabList);
+      
+        break;
+      }
     }
-  }, [currentExchangedMoney, currentSelectedCurrency]);
-  console.log(currentExchangedMoney.length);
+  }, [currentQuotes, currentSelectedCurrency, prevSelectedCurrency]);
+  
   return (
     <div className="CalculateRateBox">
       <ul className="tabs" onClick={checkCurrentActiveTab}>
-        {rateList.map((rate, index) => {
+        {tabList.map((rate, index) => {
           return (
-            <li data-rate={rate} className={`tab ${rate === currentActiveCurrency && "active"}`} key={index}>
+            <li data-rate={rate} className={`tab ${rate === currentActiveTab && "active"}`} key={index}>
               {rate}
             </li>
           );
         })}
       </ul>
-      {currentExchangedMoney.length < 5 || !currentExchangedMoney ? (
         <div className="tabsInfo">
-          <p className="countryRate">{`${currentActiveCurrency} : ${SetNumberFormat(currentMoney)}`} </p>
+          <p className="countryRate">{`${currentActiveTab} : ${currentExchangedMoney || currentMoney === 0 ? SetNumberFormat(currentMoney) : '올바른 송금액을 입력해 주세요'}`} </p>
           <p className="rateLiveDate">
             기준일: <br /> {currentTimeStamp && createDate()}
           </p>
         </div>
-      ) : (
-        <p className="alertMessage">송금액이 바르지 않습니다</p>
-      )}
     </div>
   );
 };

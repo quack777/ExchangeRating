@@ -6,7 +6,7 @@ import CalculateSecond from "../../components/CalculateSecond/CalculateSecond";
 const MainPage = () => {
   return(
     <div className="container">
-      <CaculateFirst />
+      {/* <CaculateFirst /> */}
       <CalculateSecond />
     </div>
   )

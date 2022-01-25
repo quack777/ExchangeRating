@@ -42,7 +42,7 @@ const CalculateFirst = () => {
               </select>
               </div>
                 <p>
-                    환율: {SetNumberFormat(exchangeRate[`USD${userChoice}`])} {userChoice}/USD
+                    환율: {exchangeRate && SetNumberFormat(exchangeRate[`USD${userChoice}`])} {userChoice}/USD
                 </p>
                 <p>
                     송금액: <input/> USD
