@@ -1,12 +1,8 @@
-import React from 'react';
-import './CalculateSecondTemplate.css';
+import React from "react";
+import "./CalculateSecondTemplate.css";
 
-const CalculateSecondTemplate = ({children}) => {
-    return (
-        <div className="template">
-            {children}
-        </div>
-    )
-}
+const CalculateSecondTemplate = ({ children }) => {
+  return <div className="calculateSecondTemplate">{children}</div>;
+};
 
 export default CalculateSecondTemplate;
