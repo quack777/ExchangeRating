@@ -1,9 +1,12 @@
 import React from "react";
+import CalculateSecondTemplate from './CalculateSecondTemplate';
+import CalculateSecondForm from './CalculateSecondForm';
 
 const CalculateSecond = () => {
   return(
-    <div>
-    </div>
+    <CalculateSecondTemplate>
+      <CalculateSecondForm />
+    </CalculateSecondTemplate>
   )
 };
 
