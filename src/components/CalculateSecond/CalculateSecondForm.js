@@ -71,11 +71,12 @@ const CalculateSecondForm = () => {
 
     getCurrentCurrencies();
   }, []);
-
+  console.log(Number(currentExchangedMoney).toLocaleString());
   return (
     <div className="calculateSecondForm">
       <div className="controllerHeader" onChange={checkInputedController}>
         <input className="rateInput" type="text" value={convertNum} onChange={(e) => setConvertNum(inputPriceFormat(e.target.value))} />
+        {/* <input className="rateInput" type="number" defaultvalue={Number(currentExchangedMoney).toLocaleString()} /> */}
         <select className="rateSelected">
           {countryRates.map((countryRate, index) => {
             return (

@@ -3,6 +3,8 @@ import "./CalculateRateBox.css";
 import { setMonthConvert } from "../../utils/setMonthConvert";
 import SetNumberFormat from "../../utils/SetNumberFormat";
 
+const regExp = /[,]/g;
+
 const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeStamp, currentSelectedCurrency }) => {
   const [rateList, setRateList] = useState(["CAD", "KRW", "HKD", "JPY", "CNY"]);
   const [currentActiveCurrency, setCurrentActiveCurrency] = useState("CAD");
@@ -25,8 +27,10 @@ const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeSta
       const currentCurrency = key.slice(3, key.length);
 
       if (currentCurrency === currentClickedTab) {
-        setCurrentActiveCurrency(currentCurrency);
-        setCurrentMoney(val * Number(currentExchangedMoney));
+        const convert = currentExchangedMoney.replace(regExp, "");
+        console.log(convert);
+        setCurrentActiveCurrency(convert);
+        setCurrentMoney(val * Number(convert));
       }
     }
   };
@@ -49,10 +53,12 @@ const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeSta
     if (currentActiveCurrency === "CAD") {
       const currentQuote = !currentQuotes["USDCAD"] ? 0 : currentQuotes["USDCAD"];
 
-      setCurrentMoney(currentQuote * Number(currentExchangedMoney));
+      // const convert = currentExchangedMoney.replace(regExp, "");
+      // setCurrentMoney(currentQuote * Number(convert));
+      // console.log(currentExchangedMoney);
     }
   }, [currentExchangedMoney, currentSelectedCurrency]);
-
+  console.log(currentExchangedMoney.length);
   return (
     <div className="CalculateRateBox">
       <ul className="tabs" onClick={checkCurrentActiveTab}>
