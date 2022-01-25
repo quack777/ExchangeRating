@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import CalculateRateBox from "./CalculateRateBox.js";
 import "./CalculateSecondForm.css";
 import client from "../../pages/Main/lib/api/client";
+import SetNumberFormat, { inputPriceFormat } from "../../utils/SetNumberFormat";
 
 const CalculateSecondForm = () => {
   const [countryRates, setCountryRates] = useState(["USD", "CAD", "KRW", "HKD", "JPY", "CNY"]);
@@ -9,19 +10,19 @@ const CalculateSecondForm = () => {
   const [currentTimeStamp, setCurrentTimeStamp] = useState(null);
   const [currentExchangedMoney, setCurrentExchangedMoney] = useState(0);
   const [currentSelectedCurrency, setCurrentSelectedCurrency] = useState("USD");
+  const [convertNum, setConvertNum] = useState(0);
 
   const exceptSelectedCurrencies = (currentSelectedCurrency) => {
-    const filteredCountryRates = countryRates.filter(countryRate=> countryRate !== currentSelectedCurrency );
+    const filteredCountryRates = countryRates.filter((countryRate) => countryRate !== currentSelectedCurrency);
     return filteredCountryRates;
-  }
+  };
 
   const getExchangedMoney = (amount, source, currencies) => {
-    
     return client.get("http://api.currencylayer.com/live", {
       params: {
         access_key: process.env.REACT_APP_API_KEY,
-        source: 'USD', // test
-        currencies: currencies.join(','),
+        source: "USD", // test
+        currencies: currencies.join(","),
         amount,
       },
     });
@@ -37,21 +38,21 @@ const CalculateSecondForm = () => {
       const {
         data: { quotes, timestamp },
       } = response;
-      
-      setCurrentQuotes({...currentQuotes, ...quotes});
+
+      setCurrentQuotes({ ...currentQuotes, ...quotes });
       setCurrentTimeStamp(timestamp);
 
       setCurrentExchangedMoney(currentInputedMoney);
-      
     } else if (currentTargetedController === "SELECT") {
       const currentSelectedCurrency = event.target.options[event.target.selectedIndex].value;
       setCurrentSelectedCurrency(currentSelectedCurrency);
 
       const exceptedCurrencies = exceptSelectedCurrencies(currentSelectedCurrency);
-      
+
       const response = await getExchangedMoney(currentExchangedMoney, currentSelectedCurrency, exceptedCurrencies);
-      const { data: {quotes, timestamp} } = response;
-      
+      const {
+        data: { quotes, timestamp },
+      } = response;
     }
   };
 
@@ -59,20 +60,22 @@ const CalculateSecondForm = () => {
     const getCurrentCurrencies = async () => {
       const expectedCurrencies = exceptSelectedCurrencies(currentSelectedCurrency);
 
-      const response = await getExchangedMoney(currentExchangedMoney, 'USD', expectedCurrencies);
-      const { data: {quotes, timestamp} } = response;
+      const response = await getExchangedMoney(currentExchangedMoney, "USD", expectedCurrencies);
+      const {
+        data: { quotes, timestamp },
+      } = response;
 
-      setCurrentQuotes({...currentQuotes, ...quotes});
+      setCurrentQuotes({ ...currentQuotes, ...quotes });
       setCurrentTimeStamp(timestamp);
-    }
+    };
 
     getCurrentCurrencies();
   }, []);
-  
+
   return (
     <div className="calculateSecondForm">
       <div className="controllerHeader" onChange={checkInputedController}>
-        <input className="rateInput" type="number" />
+        <input className="rateInput" type="text" value={convertNum} onChange={(e) => setConvertNum(inputPriceFormat(e.target.value))} />
         <select className="rateSelected">
           {countryRates.map((countryRate, index) => {
             return (
@@ -83,7 +86,7 @@ const CalculateSecondForm = () => {
           })}
         </select>
       </div>
-      <CalculateRateBox currentExchangedMoney={currentExchangedMoney} currentQuotes={currentQuotes} currentTimeStamp={currentTimeStamp} currentSelectedCurrency={currentSelectedCurrency}/>
+      <CalculateRateBox currentExchangedMoney={currentExchangedMoney} currentQuotes={currentQuotes} currentTimeStamp={currentTimeStamp} currentSelectedCurrency={currentSelectedCurrency} />
     </div>
   );
 };

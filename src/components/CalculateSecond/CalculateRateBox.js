@@ -1,59 +1,58 @@
 import React, { useLayoutEffect, useState } from "react";
 import "./CalculateRateBox.css";
-import {setMonthConvert} from '../../utils/setMonthConvert';
+import { setMonthConvert } from "../../utils/setMonthConvert";
+import SetNumberFormat from "../../utils/SetNumberFormat";
 
-const CalculateRateBox = ({currentExchangedMoney, currentQuotes, currentTimeStamp, currentSelectedCurrency}) => {
+const CalculateRateBox = ({ currentExchangedMoney, currentQuotes, currentTimeStamp, currentSelectedCurrency }) => {
   const [rateList, setRateList] = useState(["CAD", "KRW", "HKD", "JPY", "CNY"]);
-  const [currentActiveCurrency, setCurrentActiveCurrency] = useState('CAD');
+  const [currentActiveCurrency, setCurrentActiveCurrency] = useState("CAD");
   const [currentMoney, setCurrentMoney] = useState(0);
-  
+
   const createDate = () => {
-    
     const date = new Date(currentTimeStamp * 1000);
-    
+
     const years = date.getFullYear();
     const month = setMonthConvert(date.getMonth());
     const day = date.getDay();
 
-    return `${years} ${month} ${day}`
-  }
+    return `${years} ${month} ${day}`;
+  };
 
-  const checkCurrentActiveTab = event => {
+  const checkCurrentActiveTab = (event) => {
     const currentClickedTab = event.target.dataset.rate;
-    
-    for(let [key, val] of Object.entries(currentQuotes)) {
+
+    for (let [key, val] of Object.entries(currentQuotes)) {
       const currentCurrency = key.slice(3, key.length);
 
-      if(currentCurrency === currentClickedTab) {
+      if (currentCurrency === currentClickedTab) {
         setCurrentActiveCurrency(currentCurrency);
         setCurrentMoney(val * Number(currentExchangedMoney));
-      };
+      }
     }
-  }
+  };
 
   useLayoutEffect(() => {
-    if(currentSelectedCurrency === 'CAD') {
+    if (currentSelectedCurrency === "CAD") {
       const newRateList = [...rateList];
-      newRateList[0] = 'USD';
-      
+      newRateList[0] = "USD";
+
       setRateList(newRateList);
-      setCurrentActiveCurrency('USD');
-    } else if(currentSelectedCurrency === 'USD') {
+      setCurrentActiveCurrency("USD");
+    } else if (currentSelectedCurrency === "USD") {
       const newRateList = [...rateList];
-      newRateList[0] = 'CAD';
-      
+      newRateList[0] = "CAD";
+
       setRateList(newRateList);
-      setCurrentActiveCurrency('CAD');
+      setCurrentActiveCurrency("CAD");
     }
 
-    if(currentActiveCurrency === 'CAD') {
-      const currentQuote = !currentQuotes['USDCAD'] ? 0 : currentQuotes['USDCAD'];
-      
-      setCurrentMoney(currentQuote * Number(currentExchangedMoney))
-    }
+    if (currentActiveCurrency === "CAD") {
+      const currentQuote = !currentQuotes["USDCAD"] ? 0 : currentQuotes["USDCAD"];
 
-  }, [currentExchangedMoney, currentSelectedCurrency])
-  
+      setCurrentMoney(currentQuote * Number(currentExchangedMoney));
+    }
+  }, [currentExchangedMoney, currentSelectedCurrency]);
+
   return (
     <div className="CalculateRateBox">
       <ul className="tabs" onClick={checkCurrentActiveTab}>
@@ -65,16 +64,16 @@ const CalculateRateBox = ({currentExchangedMoney, currentQuotes, currentTimeStam
           );
         })}
       </ul>
-      {
-        currentExchangedMoney.length < 5 || !currentExchangedMoney ? (
-          <div className="tabsInfo">
-        <p className="countryRate">{`${currentActiveCurrency} : ${currentMoney}`} </p>
-        <p className="rateLiveDate">
-          기준일: <br /> {currentTimeStamp && createDate()}
-        </p>
-      </div>
-        ) : <p className="alertMessage">송금액이 바르지 않습니다</p>
-      }
+      {currentExchangedMoney.length < 5 || !currentExchangedMoney ? (
+        <div className="tabsInfo">
+          <p className="countryRate">{`${currentActiveCurrency} : ${SetNumberFormat(currentMoney)}`} </p>
+          <p className="rateLiveDate">
+            기준일: <br /> {currentTimeStamp && createDate()}
+          </p>
+        </div>
+      ) : (
+        <p className="alertMessage">송금액이 바르지 않습니다</p>
+      )}
     </div>
   );
 };
