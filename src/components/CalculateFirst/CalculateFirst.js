@@ -7,10 +7,10 @@ const CalculateFirst = () => {
     const [exchangeRate, setExchangeRate] = useState('')
     const [userChoice, setUserChoice] = useState('KRW');
     const [money,setMoney] = useState();
-    const [click, setClick] = useState(false);
+    const [submit, setSubmit] = useState(false);
 
     useEffect(()=>{
-        setClick(false)
+        setSubmit(false)
         GetApi(money,"USD")
             .then((res)=>setExchangeRate(res.data.quotes))
             .catch((err)=>console.dir(err))
@@ -21,14 +21,13 @@ const CalculateFirst = () => {
         setMoney(e.target[1].value)
         let tmpMoney = e.target[1].value;
         if (tmpMoney >=0 && tmpMoney <= 10000){
-            setClick(true);
+            setSubmit(true);
         }else{
             alert("송금액이 바르지 않습니다")
-            setClick(false)
+            setSubmit(false)
         }
         e.target[1].value = ''
     }
-
   return(
     <div className = 'FirstCalculator-container'>
         <form className = 'first-form' onSubmit={handleClick}>
@@ -42,14 +41,14 @@ const CalculateFirst = () => {
               </select>
               </div>
                 <p>
-                    환율: {SetNumberFormat(exchangeRate[`USD${userChoice}`])} {userChoice}/USD
+                    환율: {exchangeRate!==undefined && SetNumberFormat(exchangeRate[`USD${userChoice}`])} {userChoice}/USD
                 </p>
                 <p>
                     송금액: <input/> USD
                 </p>
                 <button className='first-btn' type='submit'>Submit</button>
             </form>
-                {click? <div className='first-res'>수취금액은 {SetNumberFormat(money*exchangeRate[`USD${userChoice}`])} {userChoice}입니다</div> : ''}
+                {submit? <div className='first-res'>수취금액은 {SetNumberFormat(money*exchangeRate[`USD${userChoice}`])} {userChoice}입니다</div> : ''}
         </div>
   )
 };
