@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CalculateRateBox from "./CalculateRateBox.js";
 import "./CalculateSecondForm.css";
 import client from "../../pages/Main/lib/api/client";
@@ -6,7 +6,7 @@ import client from "../../pages/Main/lib/api/client";
 const CalculateSecondForm = () => {
   const [countryRates, setCountryRates] = useState(["USD", "CAD", "KRW", "HKD", "JPY", "CNY"]);
   const [currentQuotes, setCurrentQuotes] = useState({});
-  const [currentTimeStamp, setCurrentTimeStamp] = useState(0);
+  const [currentTimeStamp, setCurrentTimeStamp] = useState(null);
   const [currentExchangedMoney, setCurrentExchangedMoney] = useState(0);
   const [currentSelectedCurrency, setCurrentSelectedCurrency] = useState("USD");
 
@@ -55,6 +55,20 @@ const CalculateSecondForm = () => {
     }
   };
 
+  useEffect(() => {
+    const getCurrentCurrencies = async () => {
+      const expectedCurrencies = exceptSelectedCurrencies(currentSelectedCurrency);
+
+      const response = await getExchangedMoney(currentExchangedMoney, 'USD', expectedCurrencies);
+      const { data: {quotes, timestamp} } = response;
+
+      setCurrentQuotes({...currentQuotes, ...quotes});
+      setCurrentTimeStamp(timestamp);
+    }
+
+    getCurrentCurrencies();
+  }, []);
+  
   return (
     <div className="calculateSecondForm">
       <div className="controllerHeader" onChange={checkInputedController}>
@@ -69,7 +83,7 @@ const CalculateSecondForm = () => {
           })}
         </select>
       </div>
-      <CalculateRateBox currentExchangedMoney={currentExchangedMoney} currentQuotes={currentQuotes} currentTimeStamp={currentTimeStamp}/>
+      <CalculateRateBox currentExchangedMoney={currentExchangedMoney} currentQuotes={currentQuotes} currentTimeStamp={currentTimeStamp} currentSelectedCurrency={currentSelectedCurrency}/>
     </div>
   );
 };
